@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include setup.py
+recursive-include custom_voiceGPT/frontend/build *
+recursive-include custom_voiceGPT *.py
+recursive-include custom_voiceGPT *.jsx
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude *~

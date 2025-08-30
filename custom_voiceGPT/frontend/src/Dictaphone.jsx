@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import React, { useState, useEffect, useRef } from "react";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 const Dictaphone = ({
   commands,
@@ -9,6 +9,7 @@ const Dictaphone = ({
   apiInProgress = false,
   listenButton = false,
   session_listen = false,
+  initialFinalTranscript = "",
 }) => {
   const {
     finalTranscript,
@@ -18,68 +19,92 @@ const Dictaphone = ({
     browserSupportsSpeechRecognition,
     isMicrophoneAvailable,
   } = useSpeechRecognition();
-  
+
+  const [editableTranscript, setEditableTranscript] = useState(""); // State for editable transcript
   const [show_transcript, setShowTranscript] = useState(true);
+  const [debouncedTranscript, setDebouncedTranscript] = useState("");
 
   const showTranscript_func = () => setShowTranscript((prev) => !prev);
-  const clearTranscript_func = () => resetTranscript();
-
-  useEffect(() => {
+  const clearTranscript_func = () => {
+    resetTranscript();
+    setEditableTranscript(""); // Clear editable transcript
+  };
+  
+  const textareaRef = useRef(null);
+  const cursorPosRef = useRef(null);
+  // Logic to process transcript based on session_listen
+  const processTranscript = () => {
     if (finalTranscript !== "") {
-      console.log("Got final result:", finalTranscript);
-      console.log("Listening?", listening);
-      console.log("listenAfterReply:", listenAfterReply);
 
-      // Clear the previous script if a keyword is found or if the transcript exceeds limits
-      if (session_listen && finalTranscript.split(" ").length > 500000) {
-        console.log("Transcript exceeds X words");
-        for (let i = 0; i < commands.length; i++) {
-          myFunc(finalTranscript, commands[i], 6);
-        }
+      if (listenButton) {
+        // When session_listen is false and not using listenButton, just append
+        myFunc(finalTranscript, { api_body: {} }, 8);
+        setEditableTranscript((prev) => `${prev} ${finalTranscript}`.trim());
         resetTranscript();
+        setEditableTranscript(""); // Clear editable transcript state
         return;
       }
 
-      if (!session_listen && finalTranscript.split(" ").length > 10000) {
-        console.log("Transcript exceeds 10000 words. Clearing.");
-        resetTranscript();
-        return;
-      }
 
-      // Clear any existing timers to prevent multiple triggers
-      const timer = setTimeout(() => {
-        // Check if user is still speaking
-        if (interimTranscript) {
-          console.log("User is still speaking, resetting timer...");
-          return; // Reset timer and do not trigger API
-        }
-
-        // Proceed to check for keywords
+      if (session_listen) {
+        // Check for keywords only when session_listen is true
+        let keywordFound = false;
         for (let i = 0; i < commands.length; i++) {
           const { keywords, api_body } = commands[i];
           for (let j = 0; j < keywords.length; j++) {
             const keyword = new RegExp(keywords[j], "i");
             const isKeywordFound = finalTranscript.search(keyword) !== -1;
-
-            if ((isKeywordFound || listenAfterReply || listenButton) && !apiInProgress) {
-              if (listenAfterReply) {
-                myFunc(finalTranscript, { api_body: { keyword: "" } }, 3);
-              } else if (isKeywordFound) {
-                myFunc(finalTranscript, commands[i], 1);
-              } else if (listenButton) {
-                myFunc(finalTranscript, commands[i], 5);
-              }
-              resetTranscript();
+  
+            if (isKeywordFound && !apiInProgress) {
+              console.log(`Keyword found: ${keywords[j]}`);
+              myFunc(finalTranscript, commands[i], 1);
+              resetTranscript(); // Reset transcript after processing keyword
+              // setEditableTranscript(""); // Clear editable transcript state
+              keywordFound = true;
               return;
             }
           }
         }
-        console.log("Waiting for a keyword");
-      }, no_response_time * 1000);
+  
+        if (!keywordFound) {
+          // Append transcript if no keyword is found
+          setEditableTranscript((prev) => `${prev} ${finalTranscript}`.trim());
+          resetTranscript(); // Clear finalTranscript after appending
+        }
+      } else {
+        // When session_listen is false, focus on capturing speech-to-text
+        if (textareaRef.current) {
+          cursorPosRef.current = textareaRef.current.selectionStart;
+        }
 
-      return () => clearTimeout(timer); // Clear the timer on component unmount or when useEffect runs again
+        console.log("Recording speech-to-text without keyword triggers");
+        setEditableTranscript((prev) => `${prev} ${finalTranscript}`.trim());
+        resetTranscript(); // Clear finalTranscript after appending
+      }
     }
-  }, [finalTranscript, interimTranscript, listening, listenAfterReply, commands, no_response_time, resetTranscript, apiInProgress, listenButton]);
+  };
+
+    useEffect(() => {
+    if (initialFinalTranscript) setEditableTranscript((prev) => `${prev} ${initialFinalTranscript}`.trim());
+  }, []);
+  
+  // Use processTranscript in useEffect to handle updates
+  useEffect(() => {
+    processTranscript();
+  }, [finalTranscript]);
+
+  const handleTranscriptChange = (e) => {
+    setEditableTranscript(e.target.value); // Update editable transcript based on user input
+  };
+
+  useEffect(() => {
+    if (textareaRef.current && cursorPosRef.current !== null) {
+      textareaRef.current.selectionStart = cursorPosRef.current;
+      textareaRef.current.selectionEnd = cursorPosRef.current;
+      cursorPosRef.current = null;
+    }
+    }, [editableTranscript]);
+
 
   if (!browserSupportsSpeechRecognition) {
     return <span>No browser support</span>;
@@ -91,18 +116,113 @@ const Dictaphone = ({
 
   return (
     <>
-      {show_transcript && (
-        <div style={{ display: "flex", flexDirection: "column", maxHeight: "250px", height: '250px', overflowY: "auto", border: "1px solid #ccc", padding: "10px" }}>
-          <span>You said: {finalTranscript || interimTranscript}</span>
-          <span>Listening: {listening ? "on" : "off"}</span>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+        <button
+          onClick={() => {
+            myFunc(editableTranscript, { api_body: {} }, 5);
+            resetTranscript();
+            setEditableTranscript("");
+            }}
+            style={{
+            backgroundColor: "rgb(196, 230, 252)",
+            color: "black",
+            border: "none",
+            padding: "5px 10px",
+            borderRadius: "3px",
+            cursor: "pointer",
+            fontSize: "0.9em",
+            }}
+          >
+            Send Transcript
+          </button>
+          <button
+            onClick={showTranscript_func}
+            style={{
+            backgroundColor: "white",
+            color: "grey",
+            border: "none",
+            padding: "5px 10px",
+            borderRadius: "3px",
+            cursor: "pointer",
+            fontSize: "0.9em",
+            }}
+          >
+            {show_transcript ? "Hide Transcript" : "Show Transcript"}
+          </button>
+          <button
+            onClick={clearTranscript_func}
+            style={{
+            backgroundColor: "white",
+            color: "grey",
+            border: "none",
+            padding: "5px 10px",
+            borderRadius: "3px",
+            cursor: "pointer",
+            fontSize: "0.9em",
+            }}
+          >
+            Clear Transcript
+          </button>
+          </div>
+          {show_transcript && (
+          <div
+            style={{
+            display: "flex",
+            flexDirection: "column",
+            maxHeight: "800px",
+            height: "550px",
+            overflowY: "auto",
+            border: "1px solid #ccc",
+            padding: "10px",
+            }}
+          >
+<span>
+  <strong>Listening:</strong>{" "}
+  <span
+    style={{
+      color: listening ? "green" : "gray",
+      fontWeight: 600,
+      animation: listening ? "flash-green 1s infinite alternate" : "none",
+    }}
+  >
+    {listening ? "ON" : "OFF"}
+  </span>
+  {/* Add the animation style only once in your component */}
+  <style>
+    {`
+      @keyframes flash-green {
+        0% { opacity: 1; }
+        100% { opacity: 0.4; }
+      }
+    `}
+  </style>
+</span>         
+            
+            <span>
+            <strong>Transcript:</strong>
+            </span>
+          {/* Live preview of interim transcript */}
+            {interimTranscript && (
+              <div style={{ color: "#888", fontStyle: "italic", marginBottom: "8px" }}>
+                {interimTranscript}
+              </div>
+            )}
+          <textarea
+            ref={textareaRef}
+            value={editableTranscript}
+            onChange={handleTranscriptChange}
+            style={{
+              backgroundColor: "rgb(255, 255, 255)",
+              color: "black",
+              width: "100%",
+              height: "550px",
+              border: "1px solid #ccc",
+              padding: "5px",
+              resize: "none",
+            }}
+          />
         </div>
       )}
-      <button onClick={showTranscript_func} style={{ marginTop: "10px" }}>
-        {show_transcript ? "Hide Transcript" : "Show Transcript"}
-      </button>
-      <button onClick={clearTranscript_func} style={{ marginTop: "10px" }}>
-        Clear Transcript
-      </button>
     </>
   );
 };

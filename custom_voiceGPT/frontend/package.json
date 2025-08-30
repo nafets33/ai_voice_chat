@@ -24,6 +24,7 @@
     "hoist-non-react-statics": "^3.3.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-markdown": "^7.1.2",
     "react-scripts": "^3.0.1",
     "react-speech-recognition": "^3.10.0",
     "streamlit-component-lib": "^1.1.3",
