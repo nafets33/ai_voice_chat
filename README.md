@@ -16,17 +16,13 @@ A Streamlit custom component that provides a chat window with voice capabilities
 pip install ai_voice_chat
 ```
 
+
+# See Demo of Component
+See Component in Action -- Demo: divergent-thinker.com/stefan
+
 ## Usage
 
 ```python
-import streamlit as st
-from custom_voiceGPT import custom_voiceGPT, VoiceGPT_options_builder
-
-# Create options
-to_builder = VoiceGPT_options_builder.create()
-to = to_builder.build()
-
-import os
 import streamlit as st
 from custom_voiceGPT import custom_voiceGPT, VoiceGPT_options_builder
 
