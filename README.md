@@ -13,7 +13,7 @@ A Streamlit custom component that provides a chat window with voice capabilities
 ## Installation
 
 ```bash
-pip install ai_voice_llmchat
+pip install ai_voice_chat
 ```
 
 ## Usage
@@ -26,7 +26,6 @@ from custom_voiceGPT import custom_voiceGPT, VoiceGPT_options_builder
 to_builder = VoiceGPT_options_builder.create()
 to = to_builder.build()
 
-```python
 import os
 import streamlit as st
 from custom_voiceGPT import custom_voiceGPT, VoiceGPT_options_builder

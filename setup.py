@@ -8,7 +8,7 @@ except FileNotFoundError:
     long_description = "Chat Window & voice component that handles conversation"
 
 setup(
-    name="ai_voice_llmchat",
+    name="ai_voice_chat",
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
