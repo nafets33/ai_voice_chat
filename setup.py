@@ -8,14 +8,14 @@ except FileNotFoundError:
     long_description = "Chat Window & voice component that handles conversation"
 
 setup(
-    name="ai_voice_chat",
+    name="streamlit-ai-voice-chat",
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
         "streamlit>=1.0.0",
     ],
     author="Stefan Stapinski",
-    author_email="stapinski89@gmail.com",
+    author_email="stefanstapinski@gmail.com",  # Use your actual TestPyPI email
     description="A Streamlit custom component that provides a chat window with voice capabilities for conversation handling",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,8 +36,4 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.7",
-    include_package_data=True,
-    package_data={
-        "custom_voiceGPT": ["frontend/build/**/*"],
-    },
 )
