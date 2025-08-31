@@ -13,7 +13,7 @@ A Streamlit custom component that provides a chat window with voice capabilities
 ## Installation
 
 ```bash
-pip install ai_voice_chat
+pip streamlit-ai-voice-chat
 ```
 
 
