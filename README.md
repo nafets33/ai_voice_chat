@@ -24,7 +24,7 @@ See Component in Action -- Demo: divergent-thinker.com/stefan
 
 ```python
 import streamlit as st
-from custom_voiceGPT import custom_voiceGPT, VoiceGPT_options_builder
+from streamlit_ai_voice_chat import custom_voiceGPT, VoiceGPT_options_builder
 
 # Create options
 to_builder = VoiceGPT_options_builder.create()
@@ -65,7 +65,6 @@ custom_voiceGPT(
     answers=[],
     initialFinalTranscript=None,
 )
-```
 ```
 
 ## Development
