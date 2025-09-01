@@ -479,6 +479,16 @@ const stopListening = () => {
   const [editedDataframe, setEditedDataframe] = useState(null);
 
   const myFunc = async (ret, command, type) => {
+
+  // if (type === 9) {
+  //   console.log("Text replacement test - type 9 detected");
+  //   console.log("Original text:", command.api_body?.original_text);
+  //   console.log("Replacement prompt:", command.api_body?.replacement_prompt);
+
+  //   // Return test string for replacement
+  //   return "<span style='color: red; font-weight: bold;'>TEST REPLACEMENT TEXT - This is a <u>test replacement</u> for the selected text.</span>";
+  // }
+
     setMessage(` (${command["api_body"]["keyword"]}) ${ret},`);
     const text = [...g_anwers, { user: ret }];
     setAnswers([...text]);
@@ -1107,8 +1117,8 @@ return (
     top: "-38px",
     left: "50%",
     transform: "translateX(-50%)",
-    background: "#222",
-    color: "#fff",
+    background: 'rgb(235, 243, 244)',
+    color: 'rgb(45, 68, 72)',
     padding: "4px 10px",
     borderRadius: "4px",
     fontSize: "13px",
@@ -1119,7 +1129,9 @@ return (
     pointerEvents: "none",
   }}
 >
-  {session_listen ? "ON" : "Keep Transcript Inplace"}
+  {session_listen
+    ? "ON"
+    : `Enable's "hey ${splitImage}" commands & holds Transcript"`}
 </span>
   )}
 </button>
@@ -1183,6 +1195,7 @@ return (
             session_listen={session_listen}
             listening={listening}
             initialFinalTranscript={kwargs.initialFinalTranscript || ""}
+            splitImage={splitImage}
           />
         </div>
       </div>
