@@ -9,11 +9,16 @@ except FileNotFoundError:
 
 setup(
     name="streamlit-ai-voice-chat",
-    version="0.1.2",
+    version="0.1.5",
     packages=find_packages(),
     install_requires=[
         "streamlit>=1.0.0",
     ],
+    include_package_data=True,  # Ensure package data is included
+    package_data={
+        "streamlit_ai_voice_chat": ["frontend/build/**/*"],  # Include all files in build
+    },
+
     author="Stefan Stapinski",
     author_email="stefanstapinski@gmail.com",  # Use your actual TestPyPI email
     description="A Streamlit custom component that provides a chat window with voice capabilities for conversation handling",

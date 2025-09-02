@@ -1,9 +1,17 @@
+# Include important files
 include README.md
 include LICENSE
 include setup.py
-recursive-include custom_voiceGPT/frontend/build *
-recursive-include custom_voiceGPT *.py
-recursive-include custom_voiceGPT *.jsx
-global-exclude __pycache__
-global-exclude *.py[co]
-global-exclude *~
+
+# Include all files in the frontend build directory
+recursive-include streamlit_ai_voice_chat/frontend/build *
+
+# Include all files in the public directory
+recursive-include streamlit_ai_voice_chat/frontend/public *
+
+# Include all files in the src directory
+recursive-include streamlit_ai_voice_chat/frontend/src *
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude __pycache__/*
