@@ -1,6 +1,6 @@
 import os
 import streamlit.components.v1 as components
-from custom_voiceGPT.options_builder import OptionsBuilder as VoiceGPT_options_builder
+from .options_builder import OptionsBuilder as VoiceGPT_options_builder
 
 _RELEASE = True
 # _RELEASE = False
@@ -27,3 +27,6 @@ def custom_voiceGPT(api, key=None, text_option=None, **kwargs):
         kwargs=kwargs,
     )
     return component_value
+
+# ✅ Export both for pip package
+__all__ = ['custom_voiceGPT', 'VoiceGPT_options_builder']
