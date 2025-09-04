@@ -47,11 +47,12 @@ const Dictaphone = ({
         setSelectedText(selected);
         setSelectionStart(start);
         setSelectionEnd(end);
-        setShowReplaceBox(true);
+        // setShowReplaceBox(true);
         setReplaceInput(""); // Clear previous input
       } else {
-        setShowReplaceBox(false);
-        setSelectedText("");
+      setSelectedText("");
+      setSelectionStart(0);
+      setSelectionEnd(0);
       }
     }
   };
@@ -138,14 +139,16 @@ const handleReplaceText = async () => {
 };
 
   // Cancel replace operation
-  const handleCancelReplace = () => {
-    setShowReplaceBox(false);
-    setSelectedText("");
-    setReplaceInput("");
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  };
+const handleCancelReplace = () => {
+  setShowReplaceBox(false);
+  setSelectedText("");
+  setReplaceInput("");
+  setSelectionStart(0);
+  setSelectionEnd(0);
+  if (textareaRef.current) {
+    textareaRef.current.focus();
+  }
+};
 
   // Focus replace input when box appears
   useEffect(() => {
@@ -297,20 +300,27 @@ useEffect(() => {
           </button>
 
         {/* New button to show replace functionality hint */}
-        <button
-          style={{
-            backgroundColor: selectedText ? "rgb(255, 245, 157)" : "rgb(245, 245, 245)",
-            color: selectedText ? "black" : "grey",
-            border: "none",
-            padding: "5px 10px",
-            borderRadius: "3px",
-            cursor: "default",
-            fontSize: "0.8em",
-          }}
-          title="Select text in transcript to replace it"
-        >
-          {selectedText ? `Selected: "${selectedText.substring(0, 20)}${selectedText.length > 20 ? '...' : ''}"` : "Select text to replace"}
-        </button>
+<button
+  onClick={() => {
+    if (selectedText) {
+      setShowReplaceBox(true);
+      setReplaceInput(""); // Clear previous input
+    }
+  }}
+  disabled={!selectedText}
+  style={{
+    backgroundColor: selectedText ? "rgb(255, 245, 157)" : "rgb(245, 245, 245)",
+    color: selectedText ? "black" : "grey",
+    border: "none",
+    padding: "5px 10px",
+    borderRadius: "3px",
+    cursor: selectedText ? "pointer" : "not-allowed",
+    fontSize: "0.8em",
+  }}
+  title={selectedText ? "Click to replace selected text" : "Select text in transcript first"}
+>
+  {selectedText ? `Replace: "${selectedText.substring(0, 20)}${selectedText.length > 20 ? '...' : ''}"` : "Select text to replace"}
+</button>
       </div>
 
       {/* Replace text input box */}
@@ -328,48 +338,65 @@ useEffect(() => {
             Replace: "<span style={{ fontStyle: "italic", color: "#666" }}>{selectedText}</span>"
           </div>
           
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <input
-              ref={replaceInputRef}
-              type="text"
-              value={replaceInput}
-              onChange={(e) => setReplaceInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleReplaceText();
-                } else if (e.key === 'Escape') {
-                  handleCancelReplace();
-                }
-              }}
-              placeholder="Enter replacement text or prompt..."
-              style={{
-                flex: 1,
-                padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                fontSize: "0.9em"
-              }}
-              disabled={isProcessingReplace}
-            />
-            
-            <button
-              onClick={handleReplaceText}
-              disabled={!replaceInput.trim() || isProcessingReplace}
-              style={{
-                backgroundColor: isProcessingReplace ? "#ccc" : "rgb(40, 167, 69)",
-                color: "white",
-                border: "none",
-                padding: "8px 15px",
-                borderRadius: "4px",
-                cursor: isProcessingReplace ? "not-allowed" : "pointer",
-                fontSize: "0.9em",
-                fontWeight: "bold"
-              }}
-            >
-              {isProcessingReplace ? "⏳" : "Replace"}
-            </button>
-            
-          </div>
+<div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+  <input
+    ref={replaceInputRef}
+    type="text"
+    value={replaceInput}
+    onChange={(e) => setReplaceInput(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        handleReplaceText();
+      } else if (e.key === 'Escape') {
+        handleCancelReplace();
+      }
+    }}
+    placeholder="Enter replacement text or prompt..."
+    style={{
+      flex: 1,
+      padding: "8px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      fontSize: "0.9em"
+    }}
+    disabled={isProcessingReplace}
+  />
+  
+  <button
+    onClick={handleReplaceText}
+    disabled={!replaceInput.trim() || isProcessingReplace}
+    style={{
+      backgroundColor: isProcessingReplace ? "#ccc" : "rgb(40, 167, 69)",
+      color: "white",
+      border: "none",
+      padding: "8px 15px",
+      borderRadius: "4px",
+      cursor: isProcessingReplace ? "not-allowed" : "pointer",
+      fontSize: "0.9em",
+      fontWeight: "bold"
+    }}
+  >
+    {isProcessingReplace ? "⏳" : "Replace"}
+  </button>
+  
+  {/* ADD THIS CANCEL BUTTON */}
+  <button
+    onClick={handleCancelReplace}
+    disabled={isProcessingReplace}
+    style={{
+      backgroundColor: "rgb(108, 117, 125)",
+      color: "white",
+      border: "none",
+      padding: "8px 15px",
+      borderRadius: "4px",
+      cursor: isProcessingReplace ? "not-allowed" : "pointer",
+      fontSize: "0.9em",
+      fontWeight: "bold"
+    }}
+  >
+    Cancel
+  </button>
+</div>
           
           <div style={{ marginTop: "8px", fontSize: "0.8em", color: "#666" }}>
             💡 Note: `Replace, will replace text with {splitImage}'s response`;

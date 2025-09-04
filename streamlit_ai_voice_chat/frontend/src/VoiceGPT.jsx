@@ -371,14 +371,14 @@ const stopListening = () => {
 
   const myFunc = async (ret, command, type) => {
 
-  // if (type === 9) {
-  //   console.log("Text replacement test - type 9 detected");
-  //   console.log("Original text:", command.api_body?.original_text);
-  //   console.log("Replacement prompt:", command.api_body?.replacement_prompt);
+  if (type === 9) {
+    console.log("Text replacement test - type 9 detected");
+    console.log("Original text:", command.api_body?.original_text);
+    console.log("Replacement prompt:", command.api_body?.replacement_prompt);
 
-  //   // Return test string for replacement
-  //   return "<span style='color: red; font-weight: bold;'>TEST REPLACEMENT TEXT - This is a <u>test replacement</u> for the selected text.</span>";
-  // }
+    // Return test string for replacement
+    return "TEST REPLACEMENT TEXT - This is a TEST";
+  }
 
     setMessage(` (${command["api_body"]["keyword"]}) ${ret},`);
     const text = [...g_anwers, { user: ret }];
