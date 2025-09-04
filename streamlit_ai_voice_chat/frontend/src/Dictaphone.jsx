@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback} from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 const Dictaphone = ({
@@ -23,7 +23,6 @@ const Dictaphone = ({
 
   const [editableTranscript, setEditableTranscript] = useState("");
   const [show_transcript, setShowTranscript] = useState(true);
-  const [debouncedTranscript, setDebouncedTranscript] = useState("");
   
   // New states for text selection and replacement
   const [selectedText, setSelectedText] = useState("");
@@ -167,7 +166,7 @@ const handleReplaceText = async () => {
   };
 
   // Logic to process transcript based on session_listen
-  const processTranscript = () => {
+  const processTranscript = useCallback(() => {
     if (finalTranscript !== "") {
 
       if (listenButton) {
@@ -184,7 +183,7 @@ const handleReplaceText = async () => {
         // Check for keywords only when session_listen is true
         let keywordFound = false;
         for (let i = 0; i < commands.length; i++) {
-          const { keywords, api_body } = commands[i];
+          const { keywords } = commands[i];
           for (let j = 0; j < keywords.length; j++) {
             const keyword = new RegExp(keywords[j], "i");
             const isKeywordFound = finalTranscript.search(keyword) !== -1;
@@ -216,16 +215,15 @@ const handleReplaceText = async () => {
         resetTranscript(); // Clear finalTranscript after appending
       }
     }
-  };
+ }, [finalTranscript, listenButton, session_listen, commands, apiInProgress]);
 
-  useEffect(() => {
-    if (initialFinalTranscript) setEditableTranscript((prev) => `${prev} ${initialFinalTranscript}`.trim());
-  }, []);
+useEffect(() => {
+  if (initialFinalTranscript) {
+    setEditableTranscript((prev) => `${prev} ${initialFinalTranscript}`.trim());
+  }
   
-  // Use processTranscript in useEffect to handle updates
-  useEffect(() => {
-    processTranscript();
-  }, [finalTranscript]);
+  processTranscript();
+}, [initialFinalTranscript, processTranscript]);
 
   const handleTranscriptChange = (e) => {
     setEditableTranscript(e.target.value); // Update editable transcript based on user input

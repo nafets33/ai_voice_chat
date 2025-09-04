@@ -9,6 +9,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+!streamlit_ai_voice_chat/frontend/build/
+!streamlit_ai_voice_chat/frontend/public/
 develop-eggs/
 dist/
 downloads/
@@ -77,3 +79,6 @@ custom_voiceGPT/frontend/yarn-error.log*
 
 # Logs
 *.log
+
+# Ignore Python virtual environment site-packages
+lib/python3.9/site-packages/

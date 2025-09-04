@@ -7,10 +7,10 @@ import MediaDisplay from "./MediaDisplay";
 import './spinner.css';
 
 
-let timer = null;
-let faceTimer = null;
+// let timer = null;
+// let faceTimer = null;
 let g_anwers = [];
-let firstFace = false;
+// let firstFace = false;
 
 const CustomVoiceGPT = (props) => {
   const { api, kwargs = {} } = props;
@@ -36,7 +36,7 @@ const CustomVoiceGPT = (props) => {
   const [imageSrc_name, setImageSrc_name] = useState(kwargs.self_image);
 
   const [message, setMessage] = useState("");
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(kwargs.answers || []);
   const [listenAfterReply, setListenAfterReply] = useState(false);
 
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -56,11 +56,11 @@ const [showTooltip_conv, setShowTooltip_conv] = useState(false);
 
   const [before_trigger_vars, before_trigger_] = useState(kwargs.before_trigger); 
   const faceData = useRef([]);
-  const faceTriggered = useRef(false);
-  const videoRef = useRef();
-  const videoHeight = 480;
-  const videoWidth = 640;
-  const canvasRef = useRef();
+  // const faceTriggered = useRef(false);
+  // const videoRef = useRef();
+  // const videoHeight = 480;
+  // const videoWidth = 640;
+  // const canvasRef = useRef();
   const audioRef = useRef(null);
   
 
@@ -73,11 +73,6 @@ const [showTooltip_conv, setShowTooltip_conv] = useState(false);
   const [datatree, setDataTree] = useState(kwargs.datatree || {});
   const [datatreeTitle, setDataTreeTitle] = useState(kwargs.datatree_title || "");
 
-useEffect(() => {
-  if (kwargs.answers) {
-    setAnswers(kwargs.answers);
-  }
-}, [kwargs.answers]);
 
 const [selectedNodes, setSelectedNodes] = useState([]);
 
@@ -305,11 +300,8 @@ const SidebarTree = ({ datatree = {}, onSelectionChange, collapsed, setCollapsed
     })
 
 }
-const [isMobile, setIsMobile] = useState(false);
-useEffect(() => {
-  const checkMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  setIsMobile(checkMobile);
-}, []);
+
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 // Update convo_mode function:
 const convo_mode = async () => {
@@ -345,24 +337,7 @@ const stopListening = () => {
   }
     }
 
-  // useEffect(() => {
-  //   const loadModels = async () => {
-  //     const MODEL_URL = process.env.PUBLIC_URL + "/models";
 
-  //     Promise.all([
-  //       faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-  //       faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-  //       faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-  //       faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-  //       faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL),
-  //     ]).then(() => setModelsLoaded(true));
-  //   };
-  //   loadModels();
-  //   const interval = setInterval(() => {
-  //     // console.log("faceData.current :>> ", faceData.current);
-  //   }, 3000);
-  //   return () => clearInterval(interval);
-  // }, []);
 
 
   const handleInputText = (event) => {
@@ -381,90 +356,6 @@ const stopListening = () => {
     }
   };
 
-  // const startVideo = () => {
-  //   setCaptureVideo(true);
-  //   navigator.mediaDevices
-  //     .getUserMedia({ video: { width: 300 } })
-  //     .then((stream) => {
-  //       let video = videoRef.current;
-  //       video.srcObject = stream;
-  //       video.play();
-  //     })
-  //     .catch((err) => {
-  //       console.error("error:", err);
-  //     });
-  // };
-
-  // const handleVideoOnPlay = () => {
-  //   setInterval(async () => {
-  //     if (canvasRef && canvasRef.current) {
-  //       canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(
-  //         videoRef.current
-  //       );
-  //       const displaySize = {
-  //         width: videoWidth,
-  //         height: videoHeight,
-  //       };
-
-  //       faceapi.matchDimensions(canvasRef.current, displaySize);
-
-  //       const detections = await faceapi
-  //         .detectAllFaces(
-  //           videoRef.current,
-  //           new faceapi.TinyFaceDetectorOptions()
-  //         )
-  //         .withFaceLandmarks()
-  //         .withFaceExpressions();
-
-  //       const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-  //       if (resizedDetections.length > 0) {
-  //         faceData.current = resizedDetections;
-  //         if (!faceTriggered.current && face_recon) {
-  //           myFunc("", { api_body: { keyword: "" } }, 2);
-  //           faceTriggered.current = true;
-  //         }
-  //       } else {
-  //         faceTimer && clearTimeout(faceTimer);
-  //         setTimeout(() => {
-  //           faceData.current = [];
-  //         }, 1000);
-  //       }
-
-  //       if (resizedDetections.length > 0 && !firstFace) {
-  //         firstFace = true;
-  //         if (kwargs.hello_audio) {
-  //           const audio = new Audio(kwargs.hello_audio);
-  //           audio.play();
-  //         }
-  //       }
-
-  //       canvasRef &&
-  //         canvasRef.current &&
-  //         canvasRef.current
-  //           .getContext("2d")
-  //           .clearRect(0, 0, videoWidth, videoHeight);
-  //       canvasRef &&
-  //         canvasRef.current &&
-  //         faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-  //       canvasRef &&
-  //         canvasRef.current &&
-  //         faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
-  //       canvasRef &&
-  //         canvasRef.current &&
-  //         faceapi.draw.drawFaceExpressions(
-  //           canvasRef.current,
-  //           resizedDetections
-  //         );
-  //     }
-  //   }, 300);
-  // };
-
-  // const closeWebcam = () => {
-  //   videoRef.current.pause();
-  //   videoRef.current.srcObject.getTracks()[0].stop();
-  //   setCaptureVideo(false);
-  // };
 
   const click_listenButton = () => {
     setlistenButton(true)
@@ -607,6 +498,7 @@ const stopListening = () => {
 
     updateWindowWidth();
     console.log("ReSize Window")
+    setSelectedActions([]);
   };
 
 // Recursive function to find a node by key in the datatree
@@ -625,15 +517,11 @@ function findNodeByKey(tree, key) {
   const background_color_chat = refresh_ask?.color_dict?.background_color_chat || 'transparent';
   const splitImage = self_image.split('.')[0]; // Split by dot
   const placeholder = `Chat with ${splitImage}`;
-  console.log("session_listen", session_listen)
-  console.log("selectedNodes", selectedNodes)
+
   const firstKey = selectedNodes[0] || null;
   const nodeObj = firstKey ? findNodeByKey(datatree, firstKey) : null;
   const nodeTitle = nodeObj?.field_name;
   const nodeLink = nodeObj?.hyperlink;
-
-//     console.log("selectedNodes", selectedNodes)
-// };
 
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarWide, setSidebarWide] = useState(450);
@@ -1204,3 +1092,108 @@ return (
 }
 
 export default CustomVoiceGPT;
+
+
+  // useEffect(() => {
+  //   const loadModels = async () => {
+  //     const MODEL_URL = process.env.PUBLIC_URL + "/models";
+
+  //     Promise.all([
+  //       faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+  //       faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+  //       faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+  //       faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+  //       faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL),
+  //     ]).then(() => setModelsLoaded(true));
+  //   };
+  //   loadModels();
+  //   const interval = setInterval(() => {
+  //     // console.log("faceData.current :>> ", faceData.current);
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+    // const startVideo = () => {
+  //   setCaptureVideo(true);
+  //   navigator.mediaDevices
+  //     .getUserMedia({ video: { width: 300 } })
+  //     .then((stream) => {
+  //       let video = videoRef.current;
+  //       video.srcObject = stream;
+  //       video.play();
+  //     })
+  //     .catch((err) => {
+  //       console.error("error:", err);
+  //     });
+  // };
+
+  // const handleVideoOnPlay = () => {
+  //   setInterval(async () => {
+  //     if (canvasRef && canvasRef.current) {
+  //       canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(
+  //         videoRef.current
+  //       );
+  //       const displaySize = {
+  //         width: videoWidth,
+  //         height: videoHeight,
+  //       };
+
+  //       faceapi.matchDimensions(canvasRef.current, displaySize);
+
+  //       const detections = await faceapi
+  //         .detectAllFaces(
+  //           videoRef.current,
+  //           new faceapi.TinyFaceDetectorOptions()
+  //         )
+  //         .withFaceLandmarks()
+  //         .withFaceExpressions();
+
+  //       const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+  //       if (resizedDetections.length > 0) {
+  //         faceData.current = resizedDetections;
+  //         if (!faceTriggered.current && face_recon) {
+  //           myFunc("", { api_body: { keyword: "" } }, 2);
+  //           faceTriggered.current = true;
+  //         }
+  //       } else {
+  //         faceTimer && clearTimeout(faceTimer);
+  //         setTimeout(() => {
+  //           faceData.current = [];
+  //         }, 1000);
+  //       }
+
+  //       if (resizedDetections.length > 0 && !firstFace) {
+  //         firstFace = true;
+  //         if (kwargs.hello_audio) {
+  //           const audio = new Audio(kwargs.hello_audio);
+  //           audio.play();
+  //         }
+  //       }
+
+  //       canvasRef &&
+  //         canvasRef.current &&
+  //         canvasRef.current
+  //           .getContext("2d")
+  //           .clearRect(0, 0, videoWidth, videoHeight);
+  //       canvasRef &&
+  //         canvasRef.current &&
+  //         faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
+  //       canvasRef &&
+  //         canvasRef.current &&
+  //         faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
+  //       canvasRef &&
+  //         canvasRef.current &&
+  //         faceapi.draw.drawFaceExpressions(
+  //           canvasRef.current,
+  //           resizedDetections
+  //         );
+  //     }
+  //   }, 300);
+  // };
+
+  // const closeWebcam = () => {
+  //   videoRef.current.pause();
+  //   videoRef.current.srcObject.getTracks()[0].stop();
+  //   setCaptureVideo(false);
+  // };
