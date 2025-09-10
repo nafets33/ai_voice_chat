@@ -150,14 +150,7 @@ const handleCancelReplace = () => {
   }
 };
 
-  // Focus replace input when box appears
-  useEffect(() => {
-    if (showReplaceBox && replaceInputRef.current) {
-      setTimeout(() => {
-        replaceInputRef.current.focus();
-      }, 100);
-    }
-  }, [showReplaceBox]);
+
 
   const showTranscript_func = () => setShowTranscript((prev) => !prev);
   
@@ -220,6 +213,19 @@ const handleCancelReplace = () => {
     }
  }, [finalTranscript, listenButton, session_listen, commands, apiInProgress]);
 
+  const handleTranscriptChange = (e) => {
+  setEditableTranscript(e.target.value); // Update editable transcript based on user input
+};
+
+  // Focus replace input when box appears
+useEffect(() => {
+  if (showReplaceBox && replaceInputRef.current) {
+    setTimeout(() => {
+      replaceInputRef.current.focus();
+    }, 100);
+  }
+}, [showReplaceBox]);
+
 useEffect(() => {
   if (initialFinalTranscript) {
     setEditableTranscript((prev) => `${prev} ${initialFinalTranscript}`.trim());
@@ -228,17 +234,14 @@ useEffect(() => {
   processTranscript();
 }, [initialFinalTranscript, processTranscript]);
 
-  const handleTranscriptChange = (e) => {
-    setEditableTranscript(e.target.value); // Update editable transcript based on user input
-  };
 
-  useEffect(() => {
-    if (textareaRef.current && cursorPosRef.current !== null) {
-      textareaRef.current.selectionStart = cursorPosRef.current;
-      textareaRef.current.selectionEnd = cursorPosRef.current;
-      cursorPosRef.current = null;
-    }
-    }, [editableTranscript]);
+useEffect(() => {
+  if (textareaRef.current && cursorPosRef.current !== null) {
+    textareaRef.current.selectionStart = cursorPosRef.current;
+    textareaRef.current.selectionEnd = cursorPosRef.current;
+    cursorPosRef.current = null;
+  }
+  }, [editableTranscript]);
 
 
   if (!browserSupportsSpeechRecognition) {

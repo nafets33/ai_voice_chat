@@ -371,13 +371,18 @@ const stopListening = () => {
 
   const myFunc = async (ret, command, type) => {
 
+  let originalText = null;
+  let replacementPrompt = null;
+
   if (type === 9) {
     console.log("Text replacement test - type 9 detected");
-    console.log("Original text:", command.api_body?.original_text);
-    console.log("Replacement prompt:", command.api_body?.replacement_prompt);
+    originalText = command.api_body?.original_text || ""; // Set original text
+    replacementPrompt = command.api_body?.replacement_prompt || ""; // Set replacement prompt
 
-    // Return test string for replacement
-    return "TEST REPLACEMENT TEXT - This is a TEST";
+    console.log("Original text:", originalText);
+    console.log("Replacement prompt:", replacementPrompt);
+    // // Return test string for replacement
+    // return "TEST REPLACEMENT TEXT - This is a TEST";
   }
 
     setMessage(` (${command["api_body"]["keyword"]}) ${ret},`);
@@ -407,6 +412,8 @@ const stopListening = () => {
         selected_actions: selectedActions,
         selected_nodes: selectedNodes,
         dataframe: dataframe,
+        originalText: originalText,
+        replacementPrompt: replacementPrompt,
       };
       console.log("api");
       const { data } = await axios.post(api, body);
@@ -488,15 +495,17 @@ const stopListening = () => {
         setEditedDataframe(data["dataframe"]);
         return; // Exit further processing if you want
 }
+      if (type === 9) {
+        return data["text"][data["text"].length - 1].response || "";
+      }
 
-      
     } catch (error) {
       console.log("api call on listen failed!", error);
       setApiInProgress(false); // Set API in progress to false on error
       setlistenButton(false)
     }
 
-    updateWindowWidth();
+    // updateWindowWidth();
     console.log("ReSize Window")
     setSelectedActions([]);
   };
