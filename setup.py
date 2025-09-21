@@ -9,7 +9,7 @@ except FileNotFoundError:
 
 setup(
     name="streamlit-ai-voice-chat",
-    version="0.1.7",
+    version="0.1.9",
     packages=find_packages(),
     install_requires=[
         "streamlit>=1.0.0",

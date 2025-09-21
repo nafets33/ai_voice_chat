@@ -381,8 +381,8 @@ const stopListening = () => {
 
     console.log("Original text:", originalText);
     console.log("Replacement prompt:", replacementPrompt);
-    // // Return test string for replacement
-    // return "TEST REPLACEMENT TEXT - This is a TEST";
+  //   // // Return test string for replacement
+  //   // return "TEST REPLACEMENT TEXT - This is a TEST";
   }
 
     setMessage(` (${command["api_body"]["keyword"]}) ${ret},`);
@@ -418,6 +418,13 @@ const stopListening = () => {
       console.log("api");
       const { data } = await axios.post(api, body);
       console.log("data :>> ", data, body);
+      if (type === 9) {
+        let resp = data["text"][data["text"].length - 1].resp || "";
+        console.log("Text replacement response:", resp);
+        
+        return resp;
+      }
+
       if (data["self_image"] && data["self_image"] !== imageSrc_name) {
         fetchImageData(data["self_image"]); // Fetch image data if it's different
       }
